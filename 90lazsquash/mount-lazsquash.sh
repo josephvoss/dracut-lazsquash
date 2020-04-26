@@ -9,7 +9,7 @@
 
 ## Util functions
 check_last_return() {
-  if ! [ "$?" != "0" ]; then
+  if [ "$?" != "0" ]; then
     die "$@"
   fi
 }
@@ -17,9 +17,6 @@ check_last_return() {
 ## Mount parititon
 
 # Check for device
-if ! [ -f $dev_name ]; then
-  die "Can't find device $dev_name! Exiting"
-fi
 
 # Detect fs type
 fstype=$(blkid -o value -s TYPE $dev_name)
@@ -27,34 +24,36 @@ fstype=$(blkid -o value -s TYPE $dev_name)
 [ -e /sys/fs/$fstype ] || modprobe $fstype
 
 mkdir -p /run/images
-mount -n -t "$fstype" -o ro $livedev /run/images
+mount -n -t "$fstype" -o ro $dev_name /run/images
 check_last_return "Unable to mount device $dev_name! Exiting."
 
 ## Mount squash
-
+mkdir -p /run/squashfs
 if ! [ -f "/run/images/$image_name" ]; then
   die "Can't find Image $image_name on $dev_name! Exiting"
 fi
-mount -n -t squash -o ro "/run/images/$image_name" "$NEWROOT"
+mount -n -t squashfs -o ro "/run/images/$image_name" /run/squashfs
 check_last_return "Unable to mount squashed image $image_name! Exiting."
 
 ## Mount overlay
-mkdir -p /overlay_tmp
+mkdir -p /run/overlay
 if ! [ -z "$overlay_size" ]; then
   mount_options+="-o size=$overlay_size"
 fi
-mount -n -t tmpfs "$mount_options" none /overlay_tmp
+mount -n -t tmpfs $mount_options none /run/overlay/
 check_last_return "Unable to mount ramdisk! Exiting."
-mkdir /overlay_tmp/upper; mkdir /overlay_tmp/work
-mount -n -t overlay overlay \
-  -o lowerdir="$NEWROOT",upperdir=/overlay_tmp/upper,workdir=/overlay_tmp/workdir \
-  "$NEWROOT"
+mkdir /run/overlay/upper; mkdir /run/overlay/work
+mount -n -t overlay \
+  -o lowerdir=/run/squashfs,upperdir=/run/overlay/upper,workdir=/run/overlay/work \
+  overlay "$NEWROOT"
 check_last_return "Unable to mount overlayfs! Exiting."
 
-## Bind mount overlay and image share
-mkdir -p "$NEWROOT/run/root_overlay"
+## Bind mount, squash, overlay and image share
+mkdir -p "$NEWROOT/run/squashfs"
+mkdir -p "$NEWROOT/run/overlay"
 mkdir -p "$NEWROOT/run/images/"
-mount -t bind /overlay_tmp/upper "$NEWROOT/run/root_overlay"
-mount -t bind /run/images "$NEWROOT/run/images"
+mount --bind /run/squashfs "$NEWROOT/run/squashfs"
+mount --bind /run/overlay/upper "$NEWROOT/run/overlay"
+mount --bind /run/images "$NEWROOT/run/images"
 
 # vim: set ts=2 sw=2 tw=0 et :

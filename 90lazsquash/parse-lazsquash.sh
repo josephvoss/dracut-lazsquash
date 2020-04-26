@@ -10,7 +10,7 @@ if [ "$root" == "lazsquash" ] && \
   ! [ -z "image_name" ]; then
 
   ## Wait for device and don't reload systemd
-  wait_for_dev -n $dev_name
+  wait_for_dev $dev_name
 
   rootok=1
 fi
