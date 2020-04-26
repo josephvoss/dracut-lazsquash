@@ -16,7 +16,8 @@ check_last_return() {
 
 ## Mount parititon
 
-fstype=$(det_img_fs $dev_name )
+## Wait for device and don't reload systemd
+wait_for_dev -n $dev_name
 
 # Check for device
 if ! [ -f $dev_name ]; then
