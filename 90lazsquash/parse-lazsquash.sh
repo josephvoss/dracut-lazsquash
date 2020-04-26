@@ -8,6 +8,10 @@ overlay_size=$(getarg overlay_size=)
 if [ "$root" == "lazsquash" ] && \
   ! [ -z "dev_name" ] && \
   ! [ -z "image_name" ]; then
+
+  ## Wait for device and don't reload systemd
+  wait_for_dev -n $dev_name
+
   rootok=1
 fi
 

@@ -16,9 +16,6 @@ check_last_return() {
 
 ## Mount parititon
 
-## Wait for device and don't reload systemd
-wait_for_dev -n $dev_name
-
 # Check for device
 if ! [ -f $dev_name ]; then
   die "Can't find device $dev_name! Exiting"
