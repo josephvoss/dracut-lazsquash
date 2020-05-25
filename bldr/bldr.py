@@ -44,7 +44,37 @@ def put_value(data_bytes, storage_config):
 
 def load_storage_config(storage_config_path):
     storage_config = json.dumps(storage_config_path)
-    return storage_config
+    return storage_config, 0
 
-def get_alias(storage_config_path):
+def check_image_list(image_name, storage_config):
+    storage_location = storage_config['storage_location']
+    image_list_path = "/".join([storage_location,"images.conf"])
+    image_list = json.dumps(image_list_path)
+    image_list_data = image_list["images"]
+    image_found = 0
+    for entry in image_list_data:
+        # Alias found
+        if image_name == alias_found["alias"]:
+            image_ref = alias_found["ref"]
+            log_print("Alias {} matches ref {}".format(image_name, image_ref))
+            image_found = 1
+            image_name = image_ref
+        # Ref is not aliased
+        elif image_name == alias_found["ref"]:
+            image_found = 1
+    # Check if image was found
+    if image_found == 0:
+        print("Image {} not found! Exiting".format(image_name))
+        return '',-1
+    return image_name, 0
+
+def mount_image_rw(image_name):
+    # Get image name
+    # 
+    return
+
+def make_writable_layer(mount_point):
+    return
+
+def save_layer():
     return
