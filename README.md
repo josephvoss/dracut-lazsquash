@@ -53,6 +53,7 @@ SYSLINUX - FAT32
 mkfs.fat -F32 /dev/sdd3
 IMAGES/STATEFUL - ext4
 for i in $(seq 4 5); do mkfs.ext4 /dev/sdd$i ; done
+e2label /dev/{} {}
 
 # Syslinux install
 
@@ -61,7 +62,10 @@ syslinux /dev/sdd3
 mount /dev/sdd3 /mnt
 cp syslinux.cfg /mnt/
 umount /mnt
+fatlabel /dev/sdd3 SYSLINUX
 ```
+Nothing happened until I added mbr boot code to the start of the disk. I guess
+this is why the BIOS partition exists, but man this is scary
 
 # Refind install
 
