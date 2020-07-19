@@ -31,7 +31,9 @@ check_last_return "Unable to mount device $dev_name! Exiting."
 mkdir -p /run/squashfs
 
 ### Parse image name spliting on commas
+OIFS=$IFS
 IFS=, image_arr=( $image_name )
+IFS=$OIFS
 
 ### Mount each image
 image_mounts=()
@@ -45,7 +47,9 @@ for image in ${image_arr[@]}; do
   image_mounts+=( "/run/squashfs/$image" )
 done
 ### Join image names for overlay mount
-lower_dirs=$(IFS=":" echo "${image_mounts[*]}")
+IFS=:
+lower_dirs=$(echo "${image_mounts[*]}")
+IFS=$OIFS
 
 ## Mount overlay
 mkdir -p /run/overlay
@@ -55,6 +59,9 @@ fi
 mount -n -t tmpfs $mount_options none /run/overlay/
 check_last_return "Unable to mount ramdisk! Exiting."
 mkdir /run/overlay/upper; mkdir /run/overlay/work
+echo mount -n -t overlay \
+  -o lowerdir=$lower_dirs,upperdir=/run/overlay/upper,workdir=/run/overlay/work \
+  overlay "$NEWROOT" > /tmp.log
 mount -n -t overlay \
   -o lowerdir=$lower_dirs,upperdir=/run/overlay/upper,workdir=/run/overlay/work \
   overlay "$NEWROOT"
