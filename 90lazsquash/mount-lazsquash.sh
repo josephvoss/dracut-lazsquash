@@ -40,7 +40,7 @@ for image in ${image_arr[@]}; do
   if ! [ -f "/run/images/$image" ]; then
     die "Can't find Image $image on $dev_name! Exiting"
   fi
-  mount -n -t squashfs -o ro "/run/images/$image " /run/squashfs/$image
+  mount -n -t squashfs -o ro /run/images/$image /run/squashfs/$image
   check_last_return "Unable to mount squashed image $image! Exiting."
   image_mounts+=( "/run/squashfs/$image" )
 done
