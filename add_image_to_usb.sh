@@ -2,6 +2,7 @@
 
 image=fedora-desktop-32-x86_64:latest
 output_path=/mnt/1
+output_image=${image/:/-}
 
 container=$(buildah from $image)
 mount_path=$(buildah mount $container)

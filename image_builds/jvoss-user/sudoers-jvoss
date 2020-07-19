@@ -1,0 +1,2 @@
+jvoss ALL=(ALL) ALL
+jvoss ALL=NOPASSWD: /sbin/halt, /sbin/reboot, /sbin/poweroff
