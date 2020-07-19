@@ -16,9 +16,3 @@ RUN dnf install -y \
   st \ 
   ncmpcpp \
   powerline-fonts
-
-RUN bash -c "useradd jvoss && echo jvoss | passwd --stdin jvoss" && \
-  echo "jvoss ALL=(ALL) ALL" >> /etc/sudoers && \
-  echo "jvoss ALL=NOPASSWD: /sbin/halt, /sbin/reboot, /sbin/poweroff" >> /etc/sudoers.d/jvoss
-
-RUN echo "/dev/disk/by-label/STATEFUL /home/jvoss/ ext4 defaults" >> /etc/fstab
