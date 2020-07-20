@@ -5,8 +5,10 @@ BASE_IMAGE=fedora-base-32-x86_64:20200710
 container=$(buildah from $BASE_IMAGE)
 mount_path=$(buildah mount $container)
 
-buildah run $container bash -c \
-  "useradd jvoss && echo jvoss | passwd --stdin jvoss"
+buildah run $container bash -c useradd jvoss
+
+# Use a real password from stdin
+buildah run $container passwd jvoss
 
 buildah copy $container ./sudoers-jvoss /etc/sudoers.d/jvoss
 
