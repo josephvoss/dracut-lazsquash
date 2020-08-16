@@ -5,6 +5,94 @@ as the rootfs with a writable ramdisk in overlay.
 
 ## USB boot stick creation
 
+Right now there's a script that will create and format the partitions needed for
+boot. Rough partition layout/motivation is shown in the table below. Need a
+hybrid MBR to support BIOS and UEFI booting.
+
+| Name | Size | Purpose |
+| - | - | - |
+| BIOS | 1M | Spacer for Hybrid boot partitions (Is this needed? Probably can remove. |
+| ESP | 250M | EFI System Partition. Contains rEFInd install for UEFI booting. Configs point to boot files in syslinux. |
+| SYSLINUX | 1G | SYSLINUX Install partition. Labeled as boot partition in hybrid MBR, contains kernels and initrd. 
+| IMAGES | 6G | Partition containing squashfs images to mount at boot |
+| STATEFUL | Rest of disk | Stateful partition for home mount, containers storage, etc |
+
+Modify the parameters and run the script `build_usb_syslinux.sh` to create these
+partitions. Afterwards manually create the Hybrid MBR if desired.
+
+```
+$ gdisk /dev/sdc
+GPT fdisk (gdisk) version 1.0.5
+
+Partition table scan:
+  MBR: protective
+  BSD: not present
+  APM: not present
+  GPT: present
+
+Found valid GPT with protective MBR; using GPT.
+
+# Enter recovery mode
+Command (? for help): r
+
+# Create hybrid MBR
+Recovery/transformation command (? for help): h
+
+WARNING! Hybrid MBRs are flaky and dangerous! If you decide not to use one,
+just hit the Enter key at the below prompt and your MBR partition table will
+be untouched.
+
+# Use the BIOS, ESP, and SYSLINUX martitions
+Type from one to three GPT partition numbers, separated by spaces, to be
+added to the hybrid MBR, in sequence: 1 2 3
+Place EFI GPT (0xEE) partition first in MBR (good for GRUB)? (Y/N): N
+
+Creating entry for GPT partition #1 (MBR partition #1)
+Enter an MBR hex code (default EF):
+Set the bootable flag? (Y/N): n
+
+Creating entry for GPT partition #2 (MBR partition #2)
+Enter an MBR hex code (default EF):
+Set the bootable flag? (Y/N): n
+
+# Set syslinux as bootable
+Creating entry for GPT partition #3 (MBR partition #3)
+Enter an MBR hex code (default 83):
+Set the bootable flag? (Y/N): y
+
+# Enter expert mode
+Recovery/transformation command (? for help): x
+
+# Regenerate disk hashes
+Expert command (? for help): h
+
+# Write to disk
+Expert command (? for help): w
+
+Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+PARTITIONS!!
+
+Do you want to proceed? (Y/N): y
+OK; writing new GUID partition table (GPT) to /dev/sdc.
+The operation has completed successfully.
+```
+
+### What's a Hybrid MBR?
+
+New partition table (GPT) supports >4 partitions and a bunch of other neat
+features. However, older firmware (mostly BIOS boots) only can read the older
+partition table format (MBR). To support >4 partitions and BIOS booting we need
+to create a GPT partition table that can also be read as an MBR table.
+
+GPT normally includes a protective MBR table, which is read and marks the entire
+disk as a single partition. This is to prevent GPT-unaware systems from
+overwriting a valid GPT disk. We can edit this protective MBR to point to the
+actual GPT partitions that we need at boot. *Caution: This removes the default
+protection on the rest of the GPT disk, so be aware the modified MBR table does
+not accurately describe the disk*. However this allows a GPT-unaware system to
+access some of the partitions defined in the GPT table.
+
+## Historical notes
 Following arch guide from
 [here](https://wiki.archlinux.org/index.php/Multiboot_USB_drive#Preparation).
 
@@ -55,7 +143,7 @@ IMAGES/STATEFUL - ext4
 for i in $(seq 4 5); do mkfs.ext4 /dev/sdd$i ; done
 e2label /dev/{} {}
 
-# Syslinux install
+### Syslinux install
 
 ```
 syslinux /dev/sdd3
@@ -67,7 +155,7 @@ fatlabel /dev/sdd3 SYSLINUX
 Nothing happened until I added mbr boot code to the start of the disk. I guess
 this is why the BIOS partition exists, but man this is scary
 
-# Refind install
+### Refind install
 
 ```
 mount /dev/disk/by-partlabel/ESP /mnt
@@ -84,10 +172,17 @@ cp refind.conf /mnt/EFI/refind/refind.conf
 umount /mnt
 ```
 
-# Install kernels
+### Install kernels
 
 ```
 mount /dev/sdd3
 cp ...
 umount /dev/sdd3
 ```
+
+## Building image for aarch64
+
+## Refs
+
+* [Hybrid MBRs, by Rod Smith](https://www.rodsbooks.com/gdisk/hybrid.html)
+* [Multiboot USB guide from Arch Wiki](https://wiki.archlinux.org/index.php/Multiboot_USB_drive#Preparation).
