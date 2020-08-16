@@ -92,6 +92,14 @@ protection on the rest of the GPT disk, so be aware the modified MBR table does
 not accurately describe the disk*. However this allows a GPT-unaware system to
 access some of the partitions defined in the GPT table.
 
+## Add images to USBs
+
+First, build the image locally by running the scripts in `image_builds`. Once
+the image is saved to a container storage, add the image name and tag to
+`add_image_usb.sh`, then run the script. This will download the image, mount it
+on the host filesystem, mount the USB device, and make a squashfs image on the
+USB mount.
+
 ## Historical notes
 Following arch guide from
 [here](https://wiki.archlinux.org/index.php/Multiboot_USB_drive#Preparation).
