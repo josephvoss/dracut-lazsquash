@@ -1,3 +1,3 @@
 FROM scratch
 
-ADD dotfiles-*.tar /dotfiles/
+ADD dotfiles-*.tar /config/
