@@ -16,3 +16,16 @@ RUN dnf install -y \
   st \ 
   ncmpcpp \
   powerline-fonts
+
+# Desktop packages
+RUN dnf copr enable -y pschyska/alacritty # Terminal copr repo
+RUN dnf install -y \
+  kernel-modules \
+  weston \
+  sway \
+  dmenu alacritty \
+  xdg-utils xdg-user-dirs \
+  NetworkManager-tui \
+  st \ 
+  ncmpcpp \
+  powerline-fonts

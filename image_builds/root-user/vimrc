@@ -1,0 +1,18 @@
+" minimal vimrc for my sanity
+
+set background=dark
+
+" line numbers
+set relativenumber
+set number
+
+" Don't complain about switching buffers
+set hidden
+
+" jk == esc 
+:inoremap jk <Esc>
+:vnoremap jk <Esc>
+:nnoremap jk <Esc>
+set timeoutlen=250 ttimeoutlen=0
+
+" vim: set ts=2 sw=2 tw=78 et :

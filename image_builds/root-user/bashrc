@@ -1,0 +1,6 @@
+# .bashrc
+
+# Vim settings
+set -o vi
+bind '"jk":vi-movement-mode'
+bind -f ~/.inputrc
