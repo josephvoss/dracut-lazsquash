@@ -16,3 +16,6 @@ RUN dnf install -y https://downloads.rclone.org/rclone-current-linux-amd64.rpm
 
 # Hostname
 RUN echo "siera-leone" >> /etc/hostname
+
+# Vdev
+COPY vdev_id.conf /etc/zfs/
