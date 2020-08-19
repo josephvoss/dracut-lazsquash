@@ -1,0 +1,12 @@
+# Unit to export zfs pools on shutdown
+[Unit]
+Description=Export ZFS pools on shutdown
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStop=/usr/bin/systemctl stop nfs-server
+ExecStop=/usr/sbin/zpool export -a
+
+[Install]
+WantedBy=multi-user.target

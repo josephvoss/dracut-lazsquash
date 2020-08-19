@@ -7,15 +7,16 @@ RUN dnf install -y http://download.zfsonlinux.org/epel/zfs-release.el8_2.noarch.
 # Load ZFS at boot
 RUN echo "zfs" >> /etc/modules-load.d/zfs.conf
 
+# Add ZFS export command at system shutdown
+COPY zfs-export.service /etc/systemd/system/
+
 # Dev tools
 RUN dnf install -y \
-  vim git tmux gcc golang python3
+  vim git tmux gcc golang python3 \
+  rsync nmap-ncat iotop bcc
 
 # Rclone
 RUN dnf install -y https://downloads.rclone.org/rclone-current-linux-amd64.rpm
 
-# Hostname
-RUN echo "siera-leone" >> /etc/hostname
-
-# Vdev
-COPY vdev_id.conf /etc/zfs/
+# NFS server
+RUN dnf install -y nfs-utils && systemctl enable nfs-server
