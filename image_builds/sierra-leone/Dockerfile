@@ -7,4 +7,4 @@ COPY vdev_id.conf /etc/zfs/
 COPY exports /etc/
 
 # Hostname
-RUN echo "siera-leone" >> /etc/hostname
+RUN echo "sierra-leone" >> /etc/hostname

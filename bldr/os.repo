@@ -1,0 +1,6 @@
+[core-os]
+#name=Centos BaseOS 8.1.1911
+name=core-os
+baseurl=http://yum.tamu.edu/centos/8.1.1911/BaseOS/x86_64/os/
+enabled=1
+gpgcheck=0

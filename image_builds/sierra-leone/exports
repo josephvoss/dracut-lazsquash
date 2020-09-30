@@ -1,0 +1,1 @@
+/diamond 192.168.1.1/24(ro,sync,no_subtree_check,no_root_squash)
